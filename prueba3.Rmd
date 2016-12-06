@@ -1,0 +1,15 @@
+---
+title: "prueba markdown3"
+output: html_document
+---
+
+```{r echo=FALSE,results='asis'}
+library(knitr)
+#tengo que llamar el data frame con la informacion de mis examenes (por especialidad y por curso)
+#results='asis' para que la salida de la tabla no se procese mas por knirt
+asignaturas <- read.csv("~/GitHub/misc/asignaturas.csv", sep=";")
+kable(asignaturas)
+
+```
+
+
