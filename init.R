@@ -1,22 +1,22 @@
-source('../GitHub/misc/defs.R')
-source('../GitHub/misc/funciones.R')
+source('../misc/defs.R')
+source('../misc/funciones.R')
 
-install.packages("dplyr")
+## install.packages("dplyr")
 
-asignaturas <- read.csv("~/GitHub/misc/asignaturas.csv", sep=";")
+## library(dplyr)
+
+asignaturas <- read.csv2("../misc/asignaturas.csv")
+rownames(asignaturas) <- NULL
 #separo las asignaturas segun especialidad de grado
-asigIE <- subset(asignaturas,titulacion=='56IE')
-asigIQ <- subset(asignaturas,titulacion=='56IQ')
-asigIA <- subset(asignaturas,titulacion=='56IA')
-asigIM <- subset(asignaturas,titulacion=='56IM')
-asigDD <- subset(asignaturas,titulacion=='56DD')
-asigDM <- subset(asignaturas,titulacion=='56DM')
-asigEE <- subset(asignaturas,titulacion=='56EE')
+asigIE <- subset(asignaturas,Titulacion=='56IE')
+asigIQ <- subset(asignaturas,Titulacion=='56IQ')
+asigIA <- subset(asignaturas,Titulacion=='56IA')
+asigIM <- subset(asignaturas,Titulacion=='56IM')
+asigDD <- subset(asignaturas,Titulacion=='56DD')
+asigDM <- subset(asignaturas,Titulacion=='56DM')
+asigEE <- subset(asignaturas,Titulacion=='56EE')
 #separo segun especialidad de master
-asigAA <- subset(asignaturas,titulacion=='56AA')
-asigAB <- subset(asignaturas,titulacion=='56AB')
-asigAC <- subset(asignaturas,titulacion=='56AC')
-
-#para que la numeracion empiece en 1
-rownames(asigIE)=1:length(rownames(asigIE))
+asigAA <- subset(asignaturas,Titulacion=='56AA')
+asigAB <- subset(asignaturas,Titulacion=='56AB')
+asigAC <- subset(asignaturas,Titulacion=='56AC')
 
