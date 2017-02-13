@@ -20,3 +20,5 @@ asigAA <- subset(asignaturas,Titulacion=='56AA')
 asigAB <- subset(asignaturas,Titulacion=='56AB')
 asigAC <- subset(asignaturas,Titulacion=='56AC')
 
+cal_examen <- read.csv2("../examenes/examenes finales.csv")
+#analizo lo que esta puesto y lo comparo
