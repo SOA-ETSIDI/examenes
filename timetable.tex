@@ -1,0 +1,154 @@
+%% https://github.com/tim6her/timetabel
+\documentclass[10pt,a4paper, landscape, spanish]{article}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{eso-pic}
+\newcommand\AtPageUpperRight[1]{\AtPageUpperLeft{%
+   \makebox[\paperwidth][r]{#1}}}
+
+\AddToShipoutPictureBG{%
+  \AtPageUpperLeft{
+    \raisebox{-1.1\height}{
+      \includegraphics[width=0.12\textwidth]{LogoUPM.pdf}
+    }}}
+
+\AddToShipoutPicture{%
+  \AtPageUpperRight{
+    \raisebox{-1.1\height}{
+      \includegraphics[width=0.12\textwidth]{LogoETSIDI.pdf}
+    }}}
+
+% Will change name of weekdays
+\usepackage[spanish]{translator}
+
+\pagestyle{empty}
+\usepackage{tikz}
+\usepackage{pgfcore}
+\usepackage{pgfcalendar}
+%% Disable hyphenation
+\usepackage[none]{hyphenat}
+
+\usepackage{mathpazo}
+%% Colors as defined in ColorBrewer
+\definecolor{Accent-5-1}{RGB}{127,201,127}
+\definecolor{Accent-5-2}{RGB}{190,174,212}
+\definecolor{Accent-5-3}{RGB}{253,192,134}
+\definecolor{Accent-5-4}{RGB}{255,255,153}
+\definecolor{Accent-5-5}{RGB}{56,108,176}
+
+\definecolor{Set1-9-1}{RGB}{228,26,28}
+\definecolor{Set1-9-2}{RGB}{55,126,184}
+\definecolor{Set1-9-3}{RGB}{77,175,74}
+\definecolor{Set1-9-4}{RGB}{152,78,163}
+\definecolor{Set1-9-5}{RGB}{255,127,0}
+\definecolor{Set1-9-6}{RGB}{255,255,51}
+\definecolor{Set1-9-7}{RGB}{166,86,40}
+\definecolor{Set1-9-8}{RGB}{247,129,191}
+\definecolor{Set1-9-9}{RGB}{153,153,153}
+
+% Setup of lengths
+\newcommand{\widthofday}{4.9}
+\newcommand{\lengthofhour}{1.1}
+\newcommand{\entrytextwidth}{3.8}
+
+% Set the first and last hour of the day (24h day format)
+\newcommand{\firstH}{8}
+\newcommand{\lastH}{21}
+
+
+% Macros for drawing calendar entries, short version will only print the title
+% of the entry 
+
+% #1 Formato
+% #2 Dia
+% #3 HoraInicio
+% #4 HoraFinal
+% #5 Asignatura
+% #6 Tipo de docencia
+% #7 Aula (o grupo correspondiente para doble grado)
+\newcommand{\calentry}[7][]{
+	\filldraw[black!50, rounded corners, #1] 
+		({day(#2,-1)},{time(#3) - 0.015}) rectangle ({day(#2,1)},{time(#4) + 0.015});%
+	\node[anchor=north, text width = 1.1 * \entrytextwidth cm, #1]
+        at ({day(#2,0)},{time(#3) - 0.016}) 
+        {\footnotesize #3 -- #4 :: \emph{#6} \hfill \textbf{#7}\\ \small \textsc{#5}};%
+}
+\newcommand{\shortcalentry}[6][]{
+	\filldraw[black!50, rounded corners, #1] 
+		({day(#2,-1)},{time(#3) - 0.015}) rectangle ({day(#2,1)},{time(#4) + 0.015});%
+	\node[font=\scriptsize, align = center, text width=\entrytextwidth cm, #1] 
+		at ({day(#2,0)},{halftime(#3,#4)}) {#5};%
+}
+
+
+% Offset for the rectangle marking appointments
+\pgfmathsetmacro{\offsetForAppointment}{+0.01pt}
+
+% Converts the integer marking the day of the week to a coordinate.
+% The second argument specifies wheter the left (-1), the base (0) or the right
+% end of the column is returned.
+\pgfmathdeclarefunction{day}{2}{%
+	\pgfmathparse{-#2*\offsetForAppointment+#1-(1-#2)/2}%
+}
+
+% Converts a given time (hh.mm) to a length. \firstH is converted to 0.
+\pgfmathdeclarefunction{time}{1}{%
+	\pgfmathparse{\firstH-(floor(#1)+(#1-floor(#1))/0.6)}%
+}
+
+% Finds the mean of the duration of the appointment. Used in \shortcalentry.
+\pgfmathdeclarefunction{halftime}{2}{%
+	\pgfmathparse{(time(#1)+time(#2))/2}%
+}
+
+\usepackage{environ}
+\NewEnviron{timetable}%
+		[2]%
+		{%
+\renewcommand{\firstH}{#1}
+\renewcommand{\lastH}{#2}
+%
+\begin{tikzpicture}[x=\widthofday cm, y=\lengthofhour cm]
+
+% Draws the timtables grid
+\foreach \hour in {\firstH,...,\lastH}
+        \draw[line width = .5pt, gray] (0,\firstH-\hour) node[left=5] {\hour.00} -- (5,\firstH-\hour)
+                 (0,\firstH+0.5-\hour) -- (5,\firstH+0.5-\hour);
+\foreach \day in {0,...,5}
+        \draw[line width=8pt,white] (\day,0.6) -- (\day,\firstH-\lastH -0.1);
+
+% Prints days of the week, first day of the week (1) is Monday!
+\foreach \day in {0,...,4}
+        \node at (0.5+\day,1) {\pgfcalendarweekdayname{\day}};
+
+{\BODY}
+
+\end{tikzpicture}
+		}%
+
+% TikZ style to display different subcalendars
+\tikzstyle{tut}=[fill=Accent-5-4!40!white, text=black]
+\tikzstyle{free}=[fill=black!10, text=black]
+
+% Formatos dependientes del tipo de docencia
+\tikzstyle{TyP}=[fill=Accent-5-1!70!white, text=black]
+\tikzstyle{Lab}=[fill=Accent-5-5!70!white, text=black]
+\tikzstyle{AC}=[fill=Accent-5-3!70!white, text=black]
+\tikzstyle{misc}=[fill=Accent-5-2!70!white, text=black]
+
+% Formatos dependientes de la asignatura
+\tikzstyle{A}=[fill=Set1-9-1!40!white, text=black]
+\tikzstyle{B}=[fill=Set1-9-2!40!white, text=black]
+\tikzstyle{C}=[fill=Set1-9-3!40!white, text=black]
+\tikzstyle{D}=[fill=Set1-9-4!40!white, text=black]
+\tikzstyle{F}=[fill=Set1-9-5!40!white, text=black]
+\tikzstyle{E}=[fill=Set1-9-6!40!white, text=black]
+\tikzstyle{G}=[fill=Set1-9-7!40!white, text=black]
+\tikzstyle{H}=[fill=Set1-9-8!40!white, text=black]
+\tikzstyle{I}=[fill=Set1-9-9!40!white, text=black]
+\tikzstyle{J}=[fill=Set1-9-9!30!white, text=black]
+\tikzstyle{K}=[fill=Set1-9-9!20!white, text=black]
+
+
